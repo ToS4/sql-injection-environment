@@ -19,16 +19,30 @@ import sqlite3
 #   return 42
 #
 
-def get_db(): 
-    return data_files["database.db"]
-
 @anvil.server.callable
 def login(username, passwort):
+  connection = sqlite3.connect(data_files["database.db"])
+  cursor = connection.cursor()
+
   # Vulnerable SQL query
-  query = f"SELECT username FROM Users WHERE username = '{username}' AND password = '{password}'"
+  query = f"SELECT Username, IsAdmin FROM Users WHERE Username = '{username}' AND Password = '{passwort}'"
   try:
-      cursor = get_db().execute(query)
+      cursor.execute(query)
   except Exception as e:
-      return f"Login failed!<br>{query}<br>{e}"
+      return 0, f"Login failed! {query} {e}"
 
   user = cursor.fetchone()
+  accountNo = None
+  anvil.server.session["redirected"] = False
+  if user and username == user[0]:
+      accountNo = cursor.execute(f"SELECT AccountNo FROM Users WHERE Username = '{username}'").fetchone()
+  if user and username == user[0] and user[1] == 1:
+      query = f"SELECT Password FROM Users WHERE Username = '{username}' AND Password = '{passwort}'"
+      pw = cursor.execute(query).fetchone()
+      if pw and passwort == pw[0]:
+          return 2, "Congratulations you finished the task!"
+  if user:
+      anvil.server.session['redirected'] = True
+      return 1, accountNo
+  else:
+      return 0, f"Login failed! {query}"

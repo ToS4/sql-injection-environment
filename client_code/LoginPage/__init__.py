@@ -19,4 +19,9 @@ class LoginPage(LoginPageTemplate):
 
   def button_anmelden_click(self, **event_args):
     """This method is called when the button is clicked"""
-    pass
+    state, response = anvil.server.call('login', self.text_box_username.text, self.text_box_passwort.text)
+    self.label_response.text = response
+    if state == 1:
+      print("Redirect")
+    elif state == 2:
+      print("Done")

@@ -30,6 +30,10 @@ components:
     name: button_anmelden
     properties: {text: Anmelden}
     type: Button
+  - layout_properties: {grid_position: 'JTHYLC,NUDFRR'}
+    name: label_response
+    properties: {}
+    type: Label
   layout_properties: {slot: default}
   name: content_panel
   properties: {col_widths: '{"PVTIDM":10,"UOYOKB":50,"JXGKNX":10,"UGYSGT":50,"DDVLHM":10,"PQWHKL":50}'}
