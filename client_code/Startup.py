@@ -1,4 +1,4 @@
-from .LoginPage import LoginPage
+from .MainPage import MainPage
 
 from anvil_extras import routing
 

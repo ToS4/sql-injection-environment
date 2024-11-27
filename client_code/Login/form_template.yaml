@@ -1,0 +1,39 @@
+components:
+- layout_properties: {grid_position: 'YHSKFO,KRXOMQ'}
+  name: label_2
+  properties: {align: center, bold: false, text: 'Username:'}
+  type: Label
+- layout_properties: {grid_position: 'YHSKFO,XEBDXS'}
+  name: text_box_username
+  properties: {}
+  type: TextBox
+- layout_properties: {grid_position: 'LEETIV,IVGQSD'}
+  name: label_3
+  properties: {align: center, bold: false, text: 'Passwort:'}
+  type: Label
+- layout_properties: {grid_position: 'LEETIV,DQVVQW'}
+  name: text_box_passwort
+  properties: {}
+  type: TextBox
+- layout_properties: {grid_position: 'GAHJWK,AECJTR'}
+  name: label_4
+  properties: {align: center, text: 'Eingabe sichern:'}
+  type: Label
+- event_bindings: {change: check_box_eingabe_sichern_change}
+  layout_properties: {grid_position: 'GAHJWK,QRMGAR'}
+  name: check_box_eingabe_sichern
+  properties: {text: ''}
+  type: CheckBox
+- event_bindings: {click: button_anmelden_click}
+  layout_properties: {grid_position: 'ILWQWY,WDVNPW'}
+  name: button_anmelden
+  properties: {text: Anmelden}
+  type: Button
+- layout_properties: {grid_position: 'JTGQCG,OZJXLB'}
+  name: label_response
+  properties: {}
+  type: Label
+container:
+  properties: {col_widths: '{"AECJTR":30,"QRMGAR":30}'}
+  type: ColumnPanel
+is_package: true
