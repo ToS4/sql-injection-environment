@@ -5,6 +5,7 @@ import anvil.files
 from anvil.files import data_files
 import anvil.server
 import sqlite3
+import requests
 
 # This is a server module. It runs on the Anvil server,
 # rather than in the user's browser.
@@ -46,3 +47,12 @@ def login(username, passwort):
       return 1, accountNo
   else:
       return 0, f"Login failed! {query}"
+
+@anvil.server.callable
+def login_with_accountNumber():
+  redirected = anvil.server.session["redirected"]
+  if not redirected:
+    return False, "Not Logged in!"
+  
+  response = requests.get("https://sql-injection-by-mohi.anvil.app/users")
+  print(response.json())

@@ -10,5 +10,5 @@ class LoggedInPage(LoggedInPageTemplate):
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
-
+    anvil.server.call("login_with_accountNumber")
     # Any code you write here will run before the form opens.
