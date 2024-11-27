@@ -5,7 +5,9 @@ import anvil.tables.query as q
 from anvil.tables import app_tables
 import anvil.server
 
+from anvil_extras import routing
 
+@routing.route('',     title='Login Page')
 class LoginPage(LoginPageTemplate):
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.

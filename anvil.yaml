@@ -14,7 +14,10 @@ db_schema:
       type: string
     server: full
     title: Files
-dependencies: []
+dependencies:
+- dep_id: dep_91ji6kcntbwcc
+  resolution_hints: {app_id: C6ZZPAPN4YYF5NVJ, name: Anvil Extras, package_name: anvil_extras}
+  version: {version_tag: v3.0.0}
 metadata: {description: SQL Injection Environment for Education by Mohi, title: SQL Injection by Mohi}
 name: SQL Injection by Mohi
 package_name: SQL_Injection_by_Mohi
@@ -32,5 +35,5 @@ services:
 - client_config: {}
   server_config: {file_table: files}
   source: /runtime/services/anvil/files.yml
-startup: {module: LoginPage, type: form}
+startup: {module: Startup, type: module}
 startup_form: null
