@@ -22,6 +22,6 @@ class LoginPage(LoginPageTemplate):
     state, response = anvil.server.call('login', self.text_box_username.text, self.text_box_passwort.text)
     self.label_response.text = response
     if state == 1:
-      print("Redirect")
+      open_form("LoggedInPage")
     elif state == 2:
       print("Done")
