@@ -12,3 +12,4 @@ class LoggedInPage(LoggedInPageTemplate):
     self.init_components(**properties)
 
     # Any code you write here will run before the form opens.
+    self.label_1.text = properties.response
