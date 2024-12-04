@@ -1,4 +1,4 @@
-from ._anvil_designer import LoginPageTemplate
+from ._anvil_designer import Level1Template
 from anvil import *
 import anvil.tables as tables
 import anvil.tables.query as q
@@ -6,7 +6,7 @@ from anvil.tables import app_tables
 import anvil.server
 
 
-class LoginPage(LoginPageTemplate):
+class Level1(Level1Template):
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.
     self.init_components(**properties)
@@ -22,6 +22,6 @@ class LoginPage(LoginPageTemplate):
     state, response = anvil.server.call('login', self.text_box_username.text, self.text_box_passwort.text)
     self.label_response.text = response
     if state == 1:
-      open_form("LoggedInPage", response=response)
+      open_form("Level2")
     elif state == 2:
       print("Done")

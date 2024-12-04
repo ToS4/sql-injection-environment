@@ -32,5 +32,5 @@ services:
 - client_config: {}
   server_config: {file_table: files}
   source: /runtime/services/anvil/files.yml
-startup: {module: LoginPage, type: form}
+startup: {module: Handler, type: module}
 startup_form: null
