@@ -6,6 +6,7 @@ from anvil.files import data_files
 import anvil.server
 import sqlite3
 import requests
+import urllib
 
 # This is a server module. It runs on the Anvil server,
 # rather than in the user's browser.
@@ -25,11 +26,6 @@ def get_level():
   if "level" in anvil.server.session:
     return anvil.server.session["level"]
   return 1
-
-@anvil.server.callable
-def get_server_msg():
-  if "server_msg" in anvil.server.session:
-    return anvil.server.session["server_msg"]
   
 
 @anvil.server.callable
@@ -57,27 +53,33 @@ def login(username, passwort):
       return 2, "Congratulations you finished the task!"
   if user:
     anvil.server.session['level'] = 2
-    msg = "Login successful but 'AccountNo' was not passed. (1)"
-    anvil.server.session["server_msg"] = msg
     connection.close()
     return 1, accountNo
   else:
     connection.close()
     return 0, f"Login failed! {query}"
+  
 
-@anvil.server.route("/")
-def login_with_accountNumber(**params):
+def get_accountNumber_from_query(url):
+  query_string = url.split('?')[-1] if '?' in url else ''
+  if query_string:
+    query_params = urllib.parse.parse_qs(query_string)
+    if "AccountNo" in query_params:
+      return query_params["AccountNo"][0]
+  return None
+
+
+@anvil.server.callable
+def login_with_accountNumber(url):
   connection = sqlite3.connect(data_files["database.db"])
   cursor = connection.cursor()
 
   level = get_level()
   
   if not level or level == 1:
-    msg = "Not Logged in!"
-    anvil.server.session["server_msg"] = msg
-    return msg
+    return "Not Logged in!"
 
-  AccountNo = params.get('AccountNo')
+  AccountNo = get_accountNumber_from_query(url)
   
   if AccountNo:
     query_balance = f"SELECT Balance FROM Balances WHERE AccountNo = {AccountNo}"
@@ -87,9 +89,7 @@ def login_with_accountNumber(**params):
       balance = cursor.execute(query_balance).fetchall()
       user = cursor.execute(query_user).fetchall()
     except Exception as e:
-      msg = f"User not found.{query_user} {query_balance} {e}"
-      anvil.server.session["server_msg"] = msg
-      return msg
+      return f"User not found.{query_user} {query_balance} {e}"
 
     user = [u[0] for u in user if isinstance(u, tuple)]
     balance = [b[0] for b in balance if isinstance(b, tuple)]
@@ -97,14 +97,8 @@ def login_with_accountNumber(**params):
     balance = balance[0] if len(balance) == 1 else balance
 
     if user:
-      msg = f"Welcome {user}! Your balance is {balance}."
-      anvil.server.session["server_msg"] = msg
-      return msg
+      return f"Welcome {user}! Your balance is {balance}."
     else:
-      msg = f"User not found. {query_user} {query_balance}"
-      anvil.server.session["server_msg"] = msg
-      return msg
+      return f"User not found. {query_user} {query_balance}"
 
-  msg = "Login successful but 'AccountNo' was not passed. (2)"
-  anvil.server.session["server_msg"] = msg
-  return msg
+  return "Login successful but 'AccountNo' was not passed."
