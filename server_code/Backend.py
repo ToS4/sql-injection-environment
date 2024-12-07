@@ -7,7 +7,7 @@ import anvil.server
 import sqlite3
 import requests
 import urllib
-
+  
 # This is a server module. It runs on the Anvil server,
 # rather than in the user's browser.
 #
@@ -102,3 +102,16 @@ def login_with_accountNumber(url):
       return f"User not found. {query_user} {query_balance}"
 
   return "Login successful but 'AccountNo' was not passed."
+
+@anvil.server.http_endpoint("/", methods=["POST"])
+def login_via_http_post():
+    request = anvil.server.request
+
+    json_data = request.json
+    if json_data:
+        name = json_data.get("username")
+        age = json_data.get("password")
+        return {"message": f"Hello {name}, you are {age} years old."}
+
+    raw_body = request.body.get_bytes().decode("utf-8")
+    return {"message": "Received raw data", "data": raw_body}
