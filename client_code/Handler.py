@@ -6,6 +6,7 @@ import anvil.server
 
 level = anvil.server.call('get_level')
 print(level)
+
 if level or level == 1:
   open_form('Level1')
 

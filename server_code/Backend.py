@@ -7,7 +7,8 @@ import anvil.server
 import sqlite3
 import requests
 import urllib
-  
+import re
+
 # This is a server module. It runs on the Anvil server,
 # rather than in the user's browser.
 #
@@ -21,8 +22,6 @@ import urllib
 #   return 42
 #
 
-sqlProof = False
-
 @anvil.server.callable
 def get_level():
   if "level" in anvil.server.session:
@@ -31,14 +30,64 @@ def get_level():
   
 @anvil.server.callable
 def change_sql_proof(state):
-  global sqlProof
-  sqlProof = state
+  print(state)
+  anvil.server.session["sqlProof"] = state
+
+@anvil.server.callable
+def isSQLProof():
+  if "sqlProof" not in anvil.server.session:
+    anvil.server.session["sqlProof"] = False
+  return anvil.server.session["sqlProof"]
+  
 
 @anvil.server.callable
 def login(username, passwort):
-  if sqlProof:
-    return 0, "SQL PROOF ON"
+  if isSQLProof():
+    pattern = r'^[a-zA-Z0-9]+$'
+    if not re.match(pattern, username):
+      return 0, "Error: Username should only contain letters and numbers!"
   
+    connection = sqlite3.connect(data_files["database.db"])
+    cursor = connection.cursor()
+    
+    try:
+      cursor.execute(
+        "SELECT Username, IsAdmin FROM Users WHERE Username = ? AND Password = ?",
+        (username, passwort)
+      )
+      user = cursor.fetchone()
+      
+      if not user:
+        connection.close()
+        return 0, "Login failed! Invalid username or password."
+      
+      accountNo = None
+      anvil.server.session['level'] = 1
+      
+      if user[0] == username:
+        cursor.execute(
+          "SELECT AccountNo FROM Users WHERE Username = ?",
+          (username,)
+        )
+        accountNo = cursor.fetchone()
+
+      if user[0] == username and user[1] == 1:
+        cursor.execute(
+          "SELECT Password FROM Users WHERE Username = ? AND Password = ?",
+          (username, passwort)
+        )
+        pw = cursor.fetchone()
+        if pw and passwort == pw[0]:
+          connection.close()
+          return 2, "Congratulations you finished the task!"
+
+      anvil.server.session['level'] = 2
+      connection.close()
+      return 1, accountNo
+    except Exception as e:
+      connection.close()
+      return 0, f"Login failed! Error: {e}"
+      
   connection = sqlite3.connect(data_files["database.db"])
   cursor = connection.cursor()
 
@@ -80,18 +129,20 @@ def get_accountNumber_from_query(url):
 
 @anvil.server.callable
 def login_with_accountNumber(url):
-  if sqlProof:
-    return "SQL PROOF ON"
-  
-  connection = sqlite3.connect(data_files["database.db"])
-  cursor = connection.cursor()
-
   level = get_level()
   
   if not level or level == 1:
     return "Not Logged in!"
 
   AccountNo = get_accountNumber_from_query(url)
+
+  if isSQLProof():
+    pattern = r'^[0-9]+$'
+    if not re.match(pattern, AccountNo):
+        return "Error: AccountNo should only contain numbers!"
+
+  connection = sqlite3.connect(data_files["database.db"])
+  cursor = connection.cursor()
   
   if AccountNo:
     query_balance = f"SELECT Balance FROM Balances WHERE AccountNo = {AccountNo}"
@@ -101,6 +152,7 @@ def login_with_accountNumber(url):
       balance = cursor.execute(query_balance).fetchall()
       user = cursor.execute(query_user).fetchall()
     except Exception as e:
+      connection.close()
       return f"User not found.{query_user} {query_balance} {e}"
 
     user = [u[0] for u in user if isinstance(u, tuple)]
@@ -109,10 +161,13 @@ def login_with_accountNumber(url):
     balance = balance[0] if len(balance) == 1 else balance
 
     if user:
+      connection.close()
       return f"Welcome {user}! Your balance is {balance}."
     else:
+      connection.close()
       return f"User not found. {query_user} {query_balance}"
 
+  connection.close()
   return "Login successful but 'AccountNo' was not passed."
 
 @anvil.server.http_endpoint("/", methods=["POST"])
