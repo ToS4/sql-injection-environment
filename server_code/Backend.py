@@ -21,15 +21,24 @@ import urllib
 #   return 42
 #
 
+sqlProof = False
+
 @anvil.server.callable
 def get_level():
   if "level" in anvil.server.session:
     return anvil.server.session["level"]
   return 1
   
+@anvil.server.callable
+def change_sql_proof(state):
+  global sqlProof
+  sqlProof = state
 
 @anvil.server.callable
 def login(username, passwort):
+  if sqlProof:
+    return 0, "SQL PROOF ON"
+  
   connection = sqlite3.connect(data_files["database.db"])
   cursor = connection.cursor()
 
@@ -71,6 +80,9 @@ def get_accountNumber_from_query(url):
 
 @anvil.server.callable
 def login_with_accountNumber(url):
+  if sqlProof:
+    return "SQL PROOF ON"
+  
   connection = sqlite3.connect(data_files["database.db"])
   cursor = connection.cursor()
 
