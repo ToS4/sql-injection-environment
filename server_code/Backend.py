@@ -23,10 +23,16 @@ import re
 #
 
 @anvil.server.callable
-def get_level():
-  if "level" in anvil.server.session:
-    return anvil.server.session["level"]
-  return 1
+def get_login_state():
+  if "login" in anvil.server.session:
+    return anvil.server.session["login"]
+  return False
+
+@anvil.server.callable
+def get_accountNo():
+  if "accountNo" in anvil.server.session:
+    return anvil.server.session["accountNo"]
+  return None
   
 @anvil.server.callable
 def change_sql_proof(state):
@@ -62,7 +68,7 @@ def login(username, passwort):
         return 0, "Login failed! Invalid username or password."
       
       accountNo = None
-      anvil.server.session['level'] = 1
+      anvil.server.session['login'] = True
       
       if user[0] == username:
         cursor.execute(
@@ -81,7 +87,7 @@ def login(username, passwort):
           connection.close()
           return 2, "Congratulations you finished the task!"
 
-      anvil.server.session['level'] = 2
+      anvil.server.session["accountNo"] = accountNo[0]
       connection.close()
       return 1, accountNo
     except Exception as e:
@@ -100,7 +106,7 @@ def login(username, passwort):
 
   user = cursor.fetchone()
   accountNo = None
-  anvil.server.session['level'] = 1
+  anvil.server.session['login'] = True
   if user and username == user[0]:
     accountNo = cursor.execute(f"SELECT AccountNo FROM Users WHERE Username = '{username}'").fetchone()
   if user and username == user[0] and user[1] == 1:
@@ -110,7 +116,7 @@ def login(username, passwort):
       connection.close()
       return 2, "Congratulations you finished the task!"
   if user:
-    anvil.server.session['level'] = 2
+    anvil.server.session["accountNo"] = accountNo[0]
     connection.close()
     return 1, accountNo
   else:
@@ -118,6 +124,7 @@ def login(username, passwort):
     return 0, f"Login failed! {query}"
   
 
+@anvil.server.callable
 def get_accountNumber_from_query(url):
   query_string = url.split('?')[-1] if '?' in url else ''
   if query_string:
@@ -129,9 +136,9 @@ def get_accountNumber_from_query(url):
 
 @anvil.server.callable
 def login_with_accountNumber(url):
-  level = get_level()
+  loggedIn = get_login_state()
   
-  if not level or level == 1:
+  if not loggedIn:
     return "Not Logged in!"
 
   AccountNo = get_accountNumber_from_query(url)

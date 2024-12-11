@@ -13,7 +13,7 @@ class Level2(Level2Template):
 
     # Any code you write here will run before the form opens.
     self.check_box_eingabe_sichern.checked = anvil.server.call('isSQLProof')
-    
+
     url=anvil.js.window.location.href
     text = anvil.server.call('login_with_accountNumber', url)
     self.label_1.text = text

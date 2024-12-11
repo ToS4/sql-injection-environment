@@ -23,8 +23,9 @@ class Level1(Level1Template):
     state, response = anvil.server.call('login', self.text_box_username.text, self.text_box_passwort.text)
     self.label_response.text = response
     if state == 1:
-      if isinstance(response, list):
-        anvil.js.window.location.href += "?AccountNo=" + str(response[0])
+      accountNo = anvil.server.call('get_accountNo')
+      if accountNo:
+        anvil.js.window.location.href += "?AccountNo=" + str(accountNo)
       open_form("Level2")
     elif state == 2:
       print("Done")
