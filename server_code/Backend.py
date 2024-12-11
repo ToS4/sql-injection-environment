@@ -22,6 +22,37 @@ import re
 #   return 42
 #
 
+def get_db():
+  connection = sqlite3.connect(':memory:')
+  cursor = connection.cursor()
+
+  cursor.execute('''CREATE TABLE IF NOT EXISTS Users (
+    AccountNo INTEGER,
+    Username TEXT,
+    Password TEXT,
+    IsAdmin BOOLEAN
+  )''')
+  cursor.execute('''CREATE TABLE IF NOT EXISTS Balances (
+    AccountNo INTEGER,
+    Balance INTEGER
+  )''')
+  
+  cursor.execute("DELETE FROM Users")
+  cursor.execute("DELETE FROM Balances")
+  
+  users = [
+    [4509693768, "davidProf", "kannNichtCoden", True, 5000],
+    [4509693769, "frodo", "DerEineRing", False, 1000],
+    [6982620828, "glorfindel", "Unsterblicher", False, 2000]
+  ]
+  
+  for user in users:
+    cursor.execute("INSERT INTO Users (AccountNo, Username, Password, IsAdmin) VALUES (?, ?, ?, ?)", user[:4])
+    cursor.execute("INSERT INTO Balances (AccountNo, Balance) VALUES (?, ?)", (user[0], user[4]))
+  
+  return connection
+
+
 @anvil.server.callable
 def get_login_state():
   if "login" in anvil.server.session:
@@ -53,9 +84,9 @@ def login(username, passwort):
     if not re.match(pattern, username):
       return 0, "Error: Username should only contain letters and numbers!"
   
-    connection = sqlite3.connect(data_files["database.db"])
+    connection = get_db()
     cursor = connection.cursor()
-    
+
     try:
       cursor.execute(
         "SELECT Username, IsAdmin FROM Users WHERE Username = ? AND Password = ?",
@@ -94,7 +125,7 @@ def login(username, passwort):
       connection.close()
       return 0, f"Login failed! Error: {e}"
       
-  connection = sqlite3.connect(data_files["database.db"])
+  connection = get_db()
   cursor = connection.cursor()
 
   # Vulnerable SQL query
@@ -116,7 +147,8 @@ def login(username, passwort):
       connection.close()
       return 2, "Congratulations you finished the task!"
   if user:
-    anvil.server.session["accountNo"] = accountNo[0]
+    if accountNo:
+      anvil.server.session["accountNo"] = accountNo[0]
     connection.close()
     return 1, accountNo
   else:
@@ -148,7 +180,7 @@ def login_with_accountNumber(url):
     if not re.match(pattern, AccountNo):
         return "Error: AccountNo should only contain numbers!"
 
-  connection = sqlite3.connect(data_files["database.db"])
+  connection = get_db()
   cursor = connection.cursor()
   
   if AccountNo:
