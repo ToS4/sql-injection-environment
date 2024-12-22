@@ -22,3 +22,8 @@ class Level2(Level2Template):
   def check_box_eingabe_sichern_change(self, **event_args):
     """This method is called when this checkbox is checked or unchecked"""
     anvil.server.call('change_sql_proof', state=self.check_box_eingabe_sichern.checked)
+
+  def button_anmelden_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    anvil.server.call("logout")
+    anvil.js.window.location.href = anvil.server.get_app_origin()

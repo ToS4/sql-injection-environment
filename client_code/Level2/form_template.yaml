@@ -13,6 +13,11 @@ components:
     name: check_box_eingabe_sichern
     properties: {text: ''}
     type: CheckBox
+  - event_bindings: {click: button_anmelden_click}
+    layout_properties: {grid_position: 'WAWLVU,AVKSGQ'}
+    name: button_abmelden
+    properties: {text: Abmelden}
+    type: Button
   layout_properties: {slot: default}
   name: content_panel
   properties: {col_widths: '{"VHGVPV":10,"ROTWYO":50}'}
@@ -27,7 +32,7 @@ components:
   type: FlowPanel
 - layout_properties: {slot: title}
   name: label_1_copy
-  properties: {text: SQL Injection - by Mohi}
+  properties: {text: SQL Injection Environment}
   type: Label
 container:
   properties: {html: '@theme:standard-page.html'}

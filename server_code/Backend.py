@@ -75,7 +75,11 @@ def isSQLProof():
   if "sqlProof" not in anvil.server.session:
     anvil.server.session["sqlProof"] = False
   return anvil.server.session["sqlProof"]
-  
+
+@anvil.server.callable
+def logout(username, passwort):
+  anvil.server.session['login'] = False
+  anvil.server.session['accountNo'] = None
 
 @anvil.server.callable
 def login(username, passwort):
@@ -208,16 +212,3 @@ def login_with_accountNumber(url):
 
   connection.close()
   return "Login successful but 'AccountNo' was not passed."
-
-@anvil.server.http_endpoint("/", methods=["POST"])
-def login_via_http_post():
-    request = anvil.server.request
-
-    json_data = request.json
-    if json_data:
-        name = json_data.get("username")
-        age = json_data.get("password")
-        return {"message": f"Hello {name}, you are {age} years old."}
-
-    raw_body = request.body.get_bytes().decode("utf-8")
-    return {"message": "Received raw data", "data": raw_body}

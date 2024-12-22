@@ -49,7 +49,7 @@ components:
   type: FlowPanel
 - layout_properties: {slot: title}
   name: label_1
-  properties: {text: SQL Injection - by Mohi}
+  properties: {text: SQL Injection Environment}
   type: Label
 container:
   properties: {html: '@theme:standard-page.html'}
