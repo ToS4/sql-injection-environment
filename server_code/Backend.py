@@ -77,7 +77,7 @@ def isSQLProof():
   return anvil.server.session["sqlProof"]
 
 @anvil.server.callable
-def logout(username, passwort):
+def logout():
   anvil.server.session['login'] = False
   anvil.server.session['accountNo'] = None
 
