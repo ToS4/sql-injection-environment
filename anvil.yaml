@@ -15,9 +15,9 @@ db_schema:
     server: full
     title: Files
 dependencies: []
-metadata: {description: SQL Injection Environment for Education by Mohi, title: SQL Injection by Mohi}
-name: SQL Injection by Mohi
-package_name: SQL_Injection_by_Mohi
+metadata: {description: SQL Injection Environment for Education, title: SQL Injection Environment}
+name: SQL Injection Environment
+package_name: SQL_Injection_Environment
 renamed: true
 runtime_options:
   client_version: '3'
